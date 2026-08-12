@@ -127,7 +127,7 @@ function PostSkeleton() {
 }
 
 function CommentComposer({ postId, isPosting, postError }: any) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch() as any;
   const [text, setText] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -149,7 +149,7 @@ function CommentComposer({ postId, isPosting, postError }: any) {
 
   function handleSubmit() {
     if (!text.trim() && !image) return;
-    (dispatch(createComment({ postId, content: text.trim(), image })) as any).then((res: any) => {
+    dispatch(createComment({ postId, content: text.trim(), image })).then((res: any) => {
       if (!res.error) {
         setText("");
         removeImage();
@@ -252,7 +252,7 @@ function CommentComposer({ postId, isPosting, postError }: any) {
 
 // ---------- Single comment: view / edit / delete / like ----------
 function CommentItem({ postId, comment, currentUserId }: any) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch() as any;
 
   const commentUserId = normalizeId(
     comment.commentCreator?._id ||
@@ -303,10 +303,8 @@ function CommentItem({ postId, comment, currentUserId }: any) {
   function saveEdit() {
     if (!editText.trim()) return;
     setIsSaving(true);
-    (
-      dispatch(
-        updateComment({ postId, commentId: comment._id, content: editText.trim() })
-      ) as any
+    dispatch(
+      updateComment({ postId, commentId: comment._id, content: editText.trim() })
     ).finally(() => {
       setIsSaving(false);
       setIsEditing(false);
@@ -316,14 +314,14 @@ function CommentItem({ postId, comment, currentUserId }: any) {
   function handleDelete() {
     closeMenu();
     setIsDeleting(true);
-    (dispatch(deleteComment({ postId, commentId: comment._id })) as any).finally(() => {
+    dispatch(deleteComment({ postId, commentId: comment._id })).finally(() => {
       setIsDeleting(false);
     });
   }
 
   function handleLike() {
     setIsLiking(true);
-    (dispatch(toggleLikeComment({ postId, commentId: comment._id })) as any).finally(() => {
+    dispatch(toggleLikeComment({ postId, commentId: comment._id })).finally(() => {
       setIsLiking(false);
     });
   }
@@ -448,7 +446,7 @@ function CommentItem({ postId, comment, currentUserId }: any) {
 }
 
 function CreatePostBox() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch() as any;
   const { isPosting, postError } = useSelector((state: any) => state.posts);
   const [text, setText] = useState("");
   const [image, setImage] = useState<File | null>(null);
@@ -471,7 +469,7 @@ function CreatePostBox() {
 
   function handleSubmit() {
     if (!text.trim() && !image) return;
-    (dispatch(createPost({ body: text.trim(), image })) as any).then((res: any) => {
+    dispatch(createPost({ body: text.trim(), image })).then((res: any) => {
       if (!res.error) {
         setText("");
         removeImage();
@@ -580,7 +578,7 @@ function CreatePostBox() {
 }
 
 export default function Posts() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch() as any;
   const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
