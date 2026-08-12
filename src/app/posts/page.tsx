@@ -2,7 +2,8 @@
 
 
 
-"use client";
+
+import "use client";
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,7 +51,7 @@ import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 
-function timeAgo(dateString) {
+function timeAgo(dateString: any) {
   if (!dateString) return "";
   const date = new Date(dateString);
   const seconds = Math.floor((new Date() - date) / 1000);
@@ -70,7 +71,7 @@ function timeAgo(dateString) {
   return "just now";
 }
 
-function normalizeId(value) {
+function normalizeId(value: any) {
   if (!value) return null;
   if (typeof value === "string") return value;
   if (typeof value === "object" && value._id) return String(value._id);
@@ -116,14 +117,14 @@ function PostSkeleton() {
   );
 }
 
-function CommentComposer({ postId, isPosting, postError }) {
+function CommentComposer({ postId, isPosting, postError }: any) {
   const dispatch = useDispatch();
   const [text, setText] = useState("");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = React.useRef(null);
 
-  function handleImagePick(e) {
+  function handleImagePick(e: any) {
     const file = e.target.files?.[0];
     if (file) {
       setImage(file);
@@ -139,7 +140,7 @@ function CommentComposer({ postId, isPosting, postError }) {
 
   function handleSubmit() {
     if (!text.trim() && !image) return;
-    dispatch(createComment({ postId, content: text.trim(), image })).then((res) => {
+    dispatch(createComment({ postId, content: text.trim(), image })).then((res: any) => {
       if (!res.error) {
         setText("");
         removeImage();
@@ -188,8 +189,8 @@ function CommentComposer({ postId, isPosting, postError }) {
           size="small"
           placeholder="Write a comment..."
           value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
+          onChange={(e: any) => setText(e.target.value)}
+          onKeyDown={(e: any) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               handleSubmit();
@@ -241,7 +242,7 @@ function CommentComposer({ postId, isPosting, postError }) {
 }
 
 // ---------- Single comment: view / edit / delete / like ----------
-function CommentItem({ postId, comment, currentUserId }) {
+function CommentItem({ postId, comment, currentUserId }: any) {
   const dispatch = useDispatch();
 
   const commentUserId = normalizeId(
@@ -260,7 +261,7 @@ function CommentItem({ postId, comment, currentUserId }) {
 
   const isLikedByMe =
     Array.isArray(comment.likes) && currentUserId
-      ? comment.likes.some((l) => normalizeId(l) === currentUserId)
+      ? comment.likes.some((l: any) => normalizeId(l) === currentUserId)
       : false;
   const likesCount = comment.likes?.length ?? comment.likesCount ?? 0;
 
@@ -273,7 +274,7 @@ function CommentItem({ postId, comment, currentUserId }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
-  function openMenu(e) {
+  function openMenu(e: any) {
     setMenuAnchor(e.currentTarget);
   }
   function closeMenu() {
@@ -373,7 +374,7 @@ function CommentItem({ postId, comment, currentUserId }) {
               fullWidth
               size="small"
               value={editText}
-              onChange={(e) => setEditText(e.target.value)}
+              onChange={(e: any) => setEditText(e.target.value)}
               disabled={isSaving}
               autoFocus
               sx={{
@@ -437,13 +438,13 @@ function CommentItem({ postId, comment, currentUserId }) {
 
 function CreatePostBox() {
   const dispatch = useDispatch();
-  const { isPosting, postError } = useSelector((state) => state.posts);
+  const { isPosting, postError } = useSelector((state: any) => state.posts);
   const [text, setText] = useState("");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = React.useRef(null);
 
-  function handleImagePick(e) {
+  function handleImagePick(e: any) {
     const file = e.target.files?.[0];
     if (file) {
       setImage(file);
@@ -459,7 +460,7 @@ function CreatePostBox() {
 
   function handleSubmit() {
     if (!text.trim() && !image) return;
-    dispatch(createPost({ body: text.trim(), image })).then((res) => {
+    dispatch(createPost({ body: text.trim(), image })).then((res: any) => {
       if (!res.error) {
         setText("");
         removeImage();
@@ -481,7 +482,7 @@ function CreatePostBox() {
         minRows={2}
         placeholder="What's on your mind?"
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e: any) => setText(e.target.value)}
         disabled={isPosting}
         sx={{
           "& .MuiOutlinedInput-root": {
@@ -573,8 +574,8 @@ export default function Posts() {
   const [currentUserId, setCurrentUserId] = useState(null);
 
   const { allPosts, pagination, isLoading, isLoadingMore, isError, errorMessage } =
-    useSelector((state) => state.posts);
-  const { commentsByPost } = useSelector((state) => state.comments);
+    useSelector((state: any) => state.posts);
+  const { commentsByPost } = useSelector((state: any) => state.comments);
 
   useEffect(() => {
     dispatch(getAllPosts({ page: 1, limit: 20 }));
@@ -588,13 +589,13 @@ export default function Posts() {
   // this also means the count is always correct again after a full page refresh.
   useEffect(() => {
     const postsNeedingFetch = postsArray.filter(
-      (post) => !commentsByPost?.[post._id]
+      (post: any) => !commentsByPost?.[post._id]
     );
 
     // stagger requests instead of firing them all at once - avoids tripping any
     // rate limit on the backend, which would otherwise leave some posts stuck
     // showing the fallback count forever because their request kept failing
-    const timers = postsNeedingFetch.map((post, index) =>
+    const timers = postsNeedingFetch.map((post: any, index: number) =>
       setTimeout(() => {
         dispatch(getCommentsForPost({ postId: post._id }));
       }, index * 150)
@@ -604,8 +605,8 @@ export default function Posts() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postsArray, dispatch]);
 
-  const toggleComments = (postId) => {
-    setExpandedPostId((current) => (current === postId ? null : postId));
+  const toggleComments = (postId: any) => {
+    setExpandedPostId((current: any) => (current === postId ? null : postId));
   };
 
   // pagination.currentPage / numberOfPages come from the backend's meta.pagination
@@ -694,7 +695,7 @@ export default function Posts() {
               </Alert>
             )}
 
-            {postsArray.map((post) => {
+            {postsArray.map((post: any) => {
               const isExpanded = expandedPostId === post._id;
               const postCommentsState = commentsByPost?.[post._id];
               const postComments = postCommentsState?.items ?? [];
@@ -845,7 +846,7 @@ export default function Posts() {
                         </Typography>
                       ) : (
                         <Stack spacing={1.5} sx={{ pt: 2 }}>
-                          {postComments.map((comment) => (
+                          {postComments.map((comment: any) => (
                             <CommentItem
                               key={comment._id}
                               postId={post._id}
