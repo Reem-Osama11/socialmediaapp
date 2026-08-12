@@ -129,9 +129,9 @@ function PostSkeleton() {
 function CommentComposer({ postId, isPosting, postError }: any) {
   const dispatch = useDispatch();
   const [text, setText] = useState("");
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const fileInputRef = React.useRef(null);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   function handleImagePick(e: any) {
     const file = e.target.files?.[0];
@@ -274,7 +274,7 @@ function CommentItem({ postId, comment, currentUserId }: any) {
       : false;
   const likesCount = comment.likes?.length ?? comment.likesCount ?? 0;
 
-  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(
     comment.content || comment.body || comment.text || ""
@@ -449,9 +449,9 @@ function CreatePostBox() {
   const dispatch = useDispatch();
   const { isPosting, postError } = useSelector((state: any) => state.posts);
   const [text, setText] = useState("");
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const fileInputRef = React.useRef(null);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   function handleImagePick(e: any) {
     const file = e.target.files?.[0];
@@ -579,8 +579,8 @@ function CreatePostBox() {
 
 export default function Posts() {
   const dispatch = useDispatch();
-  const [expandedPostId, setExpandedPostId] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(null);
+  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const { allPosts, pagination, isLoading, isLoadingMore, isError, errorMessage } =
     useSelector((state: any) => state.posts);
