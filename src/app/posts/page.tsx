@@ -1,9 +1,4 @@
-
-
-
-
-
- "use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -51,10 +46,25 @@ import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 
+// ---------- Shape of our custom JWT payload ----------
+// jwt-decode's default JwtPayload only has standard claims (sub, iat, exp, ...).
+// Our backend puts the user id under one of several possible custom keys
+// depending on which endpoint issued the token, so we declare them all here
+// as optional so TypeScript knows about them (this is what was causing the
+// build to fail: "Property 'user' does not exist on type 'JwtPayload'").
+interface DecodedToken {
+  user?: string;
+  id?: string;
+  _id?: string;
+  userId?: string;
+  uid?: string;
+  sub?: string;
+}
+
 function timeAgo(dateString: any) {
   if (!dateString) return "";
   const date = new Date(dateString);
-const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
   const intervals = [
     { label: "year", secs: 31536000 },
     { label: "month", secs: 2592000 },
@@ -82,7 +92,7 @@ function getCurrentUserId() {
     const token = localStorage.getItem("token");
     if (!token) return null;
 
-    const decoded = jwtDecode(token);
+    const decoded = jwtDecode<DecodedToken>(token);
 
     return normalizeId(
       decoded.user ||
