@@ -54,8 +54,7 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 function timeAgo(dateString: any) {
   if (!dateString) return "";
   const date = new Date(dateString);
-  const seconds = Math.floor((new Date() - date) / 1000);
-
+const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
   const intervals = [
     { label: "year", secs: 31536000 },
     { label: "month", secs: 2592000 },
