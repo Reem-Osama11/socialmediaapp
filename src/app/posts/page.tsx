@@ -149,7 +149,7 @@ function CommentComposer({ postId, isPosting, postError }: any) {
 
   function handleSubmit() {
     if (!text.trim() && !image) return;
-    dispatch(createComment({ postId, content: text.trim(), image })).then((res: any) => {
+    (dispatch(createComment({ postId, content: text.trim(), image })) as any).then((res: any) => {
       if (!res.error) {
         setText("");
         removeImage();
@@ -303,8 +303,10 @@ function CommentItem({ postId, comment, currentUserId }: any) {
   function saveEdit() {
     if (!editText.trim()) return;
     setIsSaving(true);
-    dispatch(
-      updateComment({ postId, commentId: comment._id, content: editText.trim() })
+    (
+      dispatch(
+        updateComment({ postId, commentId: comment._id, content: editText.trim() })
+      ) as any
     ).finally(() => {
       setIsSaving(false);
       setIsEditing(false);
@@ -314,14 +316,14 @@ function CommentItem({ postId, comment, currentUserId }: any) {
   function handleDelete() {
     closeMenu();
     setIsDeleting(true);
-    dispatch(deleteComment({ postId, commentId: comment._id })).finally(() => {
+    (dispatch(deleteComment({ postId, commentId: comment._id })) as any).finally(() => {
       setIsDeleting(false);
     });
   }
 
   function handleLike() {
     setIsLiking(true);
-    dispatch(toggleLikeComment({ postId, commentId: comment._id })).finally(() => {
+    (dispatch(toggleLikeComment({ postId, commentId: comment._id })) as any).finally(() => {
       setIsLiking(false);
     });
   }
@@ -469,7 +471,7 @@ function CreatePostBox() {
 
   function handleSubmit() {
     if (!text.trim() && !image) return;
-    dispatch(createPost({ body: text.trim(), image })).then((res: any) => {
+    (dispatch(createPost({ body: text.trim(), image })) as any).then((res: any) => {
       if (!res.error) {
         setText("");
         removeImage();
