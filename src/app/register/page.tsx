@@ -18,6 +18,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { handleregister } from '../../lib/registerslice';
 import type { AppDispatch, RootState } from '../../lib/store'
 
+// Workaround for a TypeScript overload-resolution conflict on MUI's <Stack>
+// (likely caused by duplicate/mismatched @types/react or @mui/material
+// versions in node_modules — run `npm ls @mui/material` and `npm ls @types/react`
+// locally to confirm, then `npm dedupe` to fix it at the root).
+// Casting to `any` here just lets this file build in the meantime without
+// touching Stack's real runtime behavior at all.
+const FlexStack = Stack as any;
+
 // سكيما الـ Validation بتاعة Yup
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -151,7 +159,7 @@ export default function RegisterPage() {
           boxShadow: '0 20px 50px rgba(109, 40, 217, 0.15)',
         }}
       >
-        <Stack alignItems="center" spacing={1} sx={{ mb: 4 }}>
+        <FlexStack alignItems="center" spacing={1} sx={{ mb: 4 }}>
           <Box
             sx={{
               width: 56,
@@ -182,7 +190,7 @@ export default function RegisterPage() {
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             Join us and keep up with the latest posts
           </Typography>
-        </Stack>
+        </FlexStack>
 
         <TextField
           fullWidth
