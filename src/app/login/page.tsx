@@ -62,7 +62,7 @@ export default function LoginPage() {
 
       // ✅ 5. لو نجح → روح للـ Home
       if (handlelogin.fulfilled.match(result)) {
-        router.push('/');
+        router.push('/posts');
       }
 
       setSubmitting(false);
