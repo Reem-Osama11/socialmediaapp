@@ -5,6 +5,8 @@ import loginSliceReducer from "../lib/loginslice";
 import profileReducer from "../lib/profileslce";
 import  commentssliceReducer from "../lib/commentsslice"
 import notificationsSliceReducer from "../lib/notifiactionslice"
+import changePasswordReducer from "../lib/changePasswordSlice";
+
  export let store=configureStore({
     reducer:{
     register: registerSliceReducer,
@@ -12,7 +14,9 @@ import notificationsSliceReducer from "../lib/notifiactionslice"
     posts: postsSliceReducer,
     photos :profileReducer ,
     comments:commentssliceReducer,
-    notifications:notificationsSliceReducer
+    notifications:notificationsSliceReducer,
+        changePassword: changePasswordReducer,
+
     }
 })
 export type RootState = ReturnType<typeof store.getState>;

@@ -206,6 +206,16 @@ export default function LoginPage() {
           sx={fieldSx}
         />
 
+        {/* ✅ لينك Change Password */}
+        <Box sx={{ textAlign: 'right', mt: -2, mb: 3 }}>
+          <Link
+            href="/change-password"
+            style={{ color: BRAND.purple, textDecoration: 'none', fontWeight: 600, fontSize: '0.875rem' }}
+          >
+            Change Password?
+          </Link>
+        </Box>
+
         <Button
           type="submit"
           fullWidth

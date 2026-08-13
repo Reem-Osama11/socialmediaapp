@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
-import { getAllPosts, createPost } from "../../lib/postsslice";
+import { getAllPosts, createPost, sharePost, toggleLikePost } from "../../lib/postsslice";
 import {
   getCommentsForPost,
   createComment,
@@ -32,6 +32,7 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
+import Popover from "@mui/material/Popover";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
@@ -577,13 +578,98 @@ function CreatePostBox() {
   );
 }
 
+// ---------- Small popover: write an optional message and share a post ----------
+function ShareComposer({ postId, anchorEl, onClose }: any) {
+  const dispatch = useDispatch() as any;
+  const { sharingPostId, shareError } = useSelector((state: any) => state.posts);
+  const [text, setText] = useState("");
+
+  const isSharing = sharingPostId === postId;
+
+  function handleShare() {
+    dispatch(sharePost({ postId, body: text.trim() })).then((res: any) => {
+      if (!res.error) {
+        setText("");
+        onClose();
+      }
+    });
+  }
+
+  return (
+    <Popover
+      open={Boolean(anchorEl)}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
+    >
+      <Box sx={{ p: 2, width: 260 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#4C1D95", mb: 1 }}>
+          Share this post
+        </Typography>
+
+        {shareError && (
+          <Alert severity="error" sx={{ borderRadius: 2, mb: 1 }}>
+            {shareError}
+          </Alert>
+        )}
+
+        <TextField
+          fullWidth
+          multiline
+          minRows={2}
+          size="small"
+          placeholder="Say something about this post (optional)..."
+          value={text}
+          onChange={(e: any) => setText(e.target.value)}
+          disabled={isSharing}
+          sx={{
+            "& .MuiOutlinedInput-root": { borderRadius: 2, bgcolor: "#F5F3FF" },
+          }}
+        />
+
+        <Stack direction="row" spacing={1} sx={{ mt: 1.5, justifyContent: "flex-end" }}>
+          <Button size="small" onClick={onClose} disabled={isSharing}>
+            Cancel
+          </Button>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={handleShare}
+            disabled={isSharing}
+            startIcon={
+              isSharing ? <CircularProgress size={14} sx={{ color: "#fff" }} /> : null
+            }
+            sx={{
+              bgcolor: "#6D28D9",
+              "&:hover": { bgcolor: "#5B21B6" },
+              "&.Mui-disabled": { bgcolor: "rgba(109,40,217,0.3)", color: "#fff" },
+            }}
+          >
+            {isSharing ? "Sharing..." : "Share"}
+          </Button>
+        </Stack>
+      </Box>
+    </Popover>
+  );
+}
+
 export default function Posts() {
   const dispatch = useDispatch() as any;
   const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [shareAnchorEl, setShareAnchorEl] = useState<HTMLElement | null>(null);
+  const [sharePostId, setSharePostId] = useState<string | null>(null);
 
-  const { allPosts, pagination, isLoading, isLoadingMore, isError, errorMessage } =
-    useSelector((state: any) => state.posts);
+  const {
+    allPosts,
+    pagination,
+    isLoading,
+    isLoadingMore,
+    isError,
+    errorMessage,
+    likingPostId,
+  } = useSelector((state: any) => state.posts);
   const { commentsByPost } = useSelector((state: any) => state.comments);
 
   useEffect(() => {
@@ -617,6 +703,20 @@ export default function Posts() {
   const toggleComments = (postId: any) => {
     setExpandedPostId((current: any) => (current === postId ? null : postId));
   };
+
+  function openShare(e: any, postId: string) {
+    setShareAnchorEl(e.currentTarget);
+    setSharePostId(postId);
+  }
+
+  function closeShare() {
+    setShareAnchorEl(null);
+    setSharePostId(null);
+  }
+
+  function handleToggleLike(postId: string) {
+    dispatch(toggleLikePost({ postId, userId: currentUserId }));
+  }
 
   // pagination.currentPage / numberOfPages come from the backend's meta.pagination
   // (field names covered defensively in case they differ slightly)
@@ -724,6 +824,16 @@ export default function Posts() {
                 ? postComments.length
                 : post.comments?.length ?? post.commentsCount ?? 0;
 
+              const sharesCount = post.shares?.length ?? post.sharesCount ?? 0;
+
+              // like state for this post - mirrors the pattern used for comment likes
+              const isLikedByMe =
+                Array.isArray(post.likes) && currentUserId
+                  ? post.likes.some((l: any) => normalizeId(l) === currentUserId)
+                  : false;
+              const likesCount = post.likes?.length ?? post.likesCount ?? 0;
+              const isLikingThisPost = likingPostId === post._id;
+
               return (
                 <Card
                   key={post._id}
@@ -789,10 +899,27 @@ export default function Posts() {
 
                   <Stack direction="row" spacing={1} sx={{ px: 2, py: 1.2, alignItems: "center" }}>
                     <Chip
-                      icon={<FavoriteRoundedIcon sx={{ color: "#DB2777 !important" }} />}
-                      label={post.likes?.length ?? post.likesCount ?? 0}
+                      icon={
+                        isLikingThisPost ? (
+                          <CircularProgress size={14} sx={{ color: "#DB2777 !important" }} />
+                        ) : isLikedByMe ? (
+                          <FavoriteRoundedIcon sx={{ color: "#DB2777 !important" }} />
+                        ) : (
+                          <FavoriteBorderRoundedIcon sx={{ color: "#DB2777 !important" }} />
+                        )
+                      }
+                      label={likesCount}
                       size="small"
-                      sx={{ bgcolor: "rgba(219, 39, 119, 0.08)", fontWeight: 600 }}
+                      onClick={() => handleToggleLike(post._id)}
+                      disabled={isLikingThisPost}
+                      sx={{
+                        bgcolor: isLikedByMe
+                          ? "rgba(219, 39, 119, 0.16)"
+                          : "rgba(219, 39, 119, 0.08)",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        "&:hover": { bgcolor: "rgba(219, 39, 119, 0.15)" },
+                      }}
                     />
 
                     <Chip
@@ -817,7 +944,26 @@ export default function Posts() {
                     />
 
                     <Box sx={{ flexGrow: 1 }} />
-                    <ShareRoundedIcon sx={{ fontSize: 20, color: "text.secondary", cursor: "pointer" }} />
+
+                    <Stack
+                      direction="row"
+                      spacing={0.5}
+                      sx={{ alignItems: "center", cursor: "pointer" }}
+                      onClick={(e: any) => openShare(e, post._id)}
+                    >
+                      {sharesCount > 0 && (
+                        <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600 }}>
+                          {sharesCount}
+                        </Typography>
+                      )}
+                      <ShareRoundedIcon
+                        sx={{
+                          fontSize: 20,
+                          color: sharePostId === post._id ? "#6D28D9" : "text.secondary",
+                          "&:hover": { color: "#6D28D9" },
+                        }}
+                      />
+                    </Stack>
                   </Stack>
 
                   {isExpanded && (
@@ -915,6 +1061,8 @@ export default function Posts() {
           </Box>
         </Stack>
       </Container>
+
+      <ShareComposer postId={sharePostId} anchorEl={shareAnchorEl} onClose={closeShare} />
     </Box>
   );
 }

@@ -130,8 +130,6 @@ function Navbar() {
                     <Typography
                         variant="h6"
                         noWrap
-                        component={Link}
-                        href="/"
                         sx={{
                             mr: 4,
                             display: { xs: 'none', md: 'flex' },
@@ -141,8 +139,6 @@ function Navbar() {
                             letterSpacing: '.05rem',
                             fontSize: '1.5rem',
                             color: '#fff',
-                            textDecoration: 'none',
-                            '&:hover': { opacity: 0.9 },
                         }}
                     >
                         ✨ SocialApp
@@ -208,12 +204,9 @@ function Navbar() {
                             fontWeight: 800,
                             letterSpacing: '.05rem',
                             color: '#fff',
-                            textDecoration: 'none',
                         }}
                     >
-                        <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-                            ✨ SocialApp
-                        </Link>
+                        ✨ SocialApp
                     </Typography>
 
                     {/* Nav links - desktop */}
