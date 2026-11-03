@@ -20,7 +20,7 @@ A full-featured social networking platform built with **Next.js, TypeScript, and
 
 <div align="center">
 
-![Social Media App Feed](./screenshots/Screenshot 2026-10-31 142940.png)
+![Social Media App Feed](./screenshots/social media.png)
 
 </div>
 
